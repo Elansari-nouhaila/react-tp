@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState,useEffect } from "react";
 import { Oval } from "react-loader-spinner";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faFrown } from "@fortawesome/free-solid-svg-icons";
@@ -38,10 +38,30 @@ function App() {
       "Samedi",
     ];
     const currentDate = new Date();
-    const date = `${WeekDays[currentDate.getDay()]} ${currentDate.getDate()} ${months[currentDate.getMonth()]
-      }`;
+    const date = `${WeekDays[currentDate.getDay()]} ${currentDate.getDate()} ${months[currentDate.getMonth()]}`;
     return date;
   };
+  const [favoriteCities, setFavoriteCities] = useState([]);
+    const [city, setCity] = useState('');
+
+    useEffect(() => {
+        const storedFavoriteCities = localStorage.getItem('favoriteCities');
+        if (storedFavoriteCities) {
+            setFavoriteCities(JSON.parse(storedFavoriteCities));
+        }
+    }, []);
+
+    const handleAddFavoriteCity = () => {
+        const newFavoriteCities = [...favoriteCities, city];
+        setFavoriteCities(newFavoriteCities);
+        localStorage.setItem('favoriteCities', JSON.stringify(newFavoriteCities));
+    };
+
+    const handleRemoveFavoriteCity = (cityToRemove) => {
+        const newFavoriteCities = favoriteCities.filter((city) => city !== cityToRemove);
+        setFavoriteCities(newFavoriteCities);
+        localStorage.setItem('favoriteCities', JSON.stringify(newFavoriteCities));
+    };
 
   const search = async (event) => {
     if (event.key === "Enter") {
@@ -88,6 +108,17 @@ function App() {
         onChange={(event) => setInput(event.target.value)}
         onKeyPress={search}
       />
+      <button onClick={handleAddFavoriteCity}>
+        Add to favorite
+      </button>
+      <ul>
+                {favoriteCities.map((city, index) => (
+                    <li key={index}>
+                        {city}
+                        <button onClick={() => handleRemoveFavoriteCity(city)}>Remove</button>
+                    </li>
+                ))}
+            </ul>
       {/* </div> */}
 
       {weather.loading && (
